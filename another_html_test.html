@@ -1,0 +1,108 @@
+<!doctype html>
+
+<html>
+    <head>
+        <title>Cytoscape Example</title>
+        <script src="node_modules/dataframe-js/dist/dataframe.min.js"></script>
+        <script src="node_modules/cytoscape/dist/cytoscape.min.js"></script>
+        <script src="node_modules/webcola/WebCola/cola.js"></script>
+    </head>
+<style>
+    body {
+    font-family: helvetica;
+    font-size: 14px;
+    }
+
+    #cy {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 999;
+    }
+
+    h1 {
+    opacity: 0.5;
+    font-size: 1em;
+    }
+</style>
+
+<body>
+    <div id="cy"></div>
+    <body>
+        <script>
+
+            const DataFrame = dfjs.DataFrame;
+            DataFrame.fromCSV('Pokemon.csv').then(
+                df => {
+                //df.show(10);
+                //console.log(df.count());
+                //console.log(df.dim())
+                var new_df;
+                var new_array = [];
+
+                new_df = df.dropMissingValues(['Total','Name']).select('Total','Name', '#')
+                new_df.show(10);
+
+                // filter to just the values we want
+                //new_df = df.select('Source', 'Target')
+                //new_df.show()
+
+                var df_array = new_df.toArray();
+
+                console.log(df_array[0][0]);
+
+
+                for (let i=0; i < df_array.length; i++){
+                    const row1 = {
+                        'data': {'id': df_array[i][0]}
+                    };
+                    const row2 = {
+                        'data': {'id': df_array[i][1]}
+                    };
+                    const row3 = {
+                        'data': {'id': df_array[i][2],
+                                'source': df_array[i][0],
+                                'target': df_array[i][1]}
+                    };
+
+                    new_array.push(row1);
+                    new_array.push(row2);
+                    new_array.push(row3);
+
+                }
+
+                var cy = cytoscape({
+                    container: document.getElementById('cy'),
+                    elements: new_array,
+                        layout: {
+                            name: 'grid'
+                        },
+                        layout: {
+						name: 'cola'
+					},
+
+					style: [
+						{
+							selector: 'node',
+							css: {
+								'background-color': '#f92411'
+							}
+						},
+
+						{
+							selector: 'edge',
+							css: {
+								'line-color': '#f92411'
+							}
+						}
+					],
+                    });
+
+                
+            })
+
+        </script>
+    </body>
+</html>
